@@ -16,4 +16,6 @@ object Networker {
 
     suspend fun getUpdateInfo() = service.getUpdateInfo()
 
+    suspend fun getSongList(version: String) = service.getSongList(version)
+
 }

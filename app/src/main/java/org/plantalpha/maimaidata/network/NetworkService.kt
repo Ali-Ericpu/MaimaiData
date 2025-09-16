@@ -8,15 +8,15 @@ import retrofit2.http.Path
 
 interface NetworkService {
 
-    @GET("/update.json")
+    @GET("update.json")
     suspend fun getUpdateInfo(): UpdateInfoResponse
 
-    @GET("/data_version.json")
+    @GET("data_version.json")
     suspend fun getDataVersion(): UpdateInfoResponse
 
-    @GET("/data/song_list/{version}.json")
+    @GET("data/song_list/{version}.json")
     suspend fun getSongList(@Path("version") version: String): List<Song>
 
-    @GET("/data/char_stats/{version}.json")
+    @GET("data/char_stats/{version}.json")
     suspend fun getChartStats(@Path("version") version: String): ChartsResponse
 }

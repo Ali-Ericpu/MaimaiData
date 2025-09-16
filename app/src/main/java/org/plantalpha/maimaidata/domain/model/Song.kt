@@ -10,6 +10,8 @@ data class Song(
     @JsonProperty("title_kana")
     val titleKana: String,
     val type: Type,
+    @JsonProperty("release_time")
+    val releaseTime: Int,
     val alias: List<String>,
     @JsonProperty("basic_info")
     val basicInfo: BasicInfo,
@@ -40,9 +42,9 @@ data class Song(
         val charter: String,
         val level: String,
         @JsonProperty("internal_level")
-        val internalLevel: Float,
+        val internalLevel: Double,
         @JsonProperty("old_internal_level")
-        val oldInternalLevel: Float?,
+        val oldInternalLevel: Double?,
         val notes: NoteInfo
     )
 
@@ -67,11 +69,12 @@ data class Song(
             "Test",
             "TEST",
             Type.DX,
+            0,
             listOf("2333", "test"),
             BasicInfo(
                 114,
                 "Test artist",
-                "舞萌",
+                "niconico & VOCALOID",
                 "1",
                 "1.1",
                 true,
