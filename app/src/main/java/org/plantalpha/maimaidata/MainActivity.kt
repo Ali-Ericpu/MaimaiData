@@ -5,10 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import org.plantalpha.maimaidata.feature.home.HomePage
+import org.plantalpha.maimaidata.feature.songdetails.SongDetailsPage
 import org.plantalpha.maimaidata.ui.theme.MaimaiDataTheme
 
 class MainActivity : ComponentActivity() {
@@ -17,8 +16,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MaimaiDataTheme {
-                Surface(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
-                    HomePage()
+                Surface(modifier = Modifier.fillMaxSize()) {
+//                    HomePage()
+                    SongDetailsPage()
                 }
 
 //                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->

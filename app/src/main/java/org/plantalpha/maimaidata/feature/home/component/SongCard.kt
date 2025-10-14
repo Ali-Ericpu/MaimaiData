@@ -1,6 +1,5 @@
 package org.plantalpha.maimaidata.feature.home.component
 
-import org.plantalpha.maimaidata.R
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -39,15 +38,15 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import coil3.compose.rememberAsyncImagePainter
+import org.plantalpha.maimaidata.R
 import org.plantalpha.maimaidata.domain.model.Song
-import org.plantalpha.maimaidata.domain.model.SongGenre
 import org.plantalpha.maimaidata.network.Networker
 import org.plantalpha.maimaidata.ui.theme.chartsScoreColors
 
 @Preview
 @Composable
 fun SongCard(songData: Song = Song.song) {
-    val theme = SongGenre.findThemeColor(songData.basicInfo.genre)
+    val theme = songData.basicInfo.genre.theme
     ConstraintLayout(
         modifier = Modifier
             .padding(4.dp)
@@ -77,7 +76,7 @@ fun SongCard(songData: Song = Song.song) {
                 .border(6.dp, theme, RoundedCornerShape(16.dp))
         )
         GenreTag(
-            genre = songData.basicInfo.genre,
+            genre = songData.basicInfo.genre.type,
             color = theme,
             modifier = Modifier.constrainAs(genreRef) {
                 top.linkTo(backgroundRef.top, (-18).dp)
@@ -107,12 +106,14 @@ fun SongCard(songData: Song = Song.song) {
             Text(
                 text = songData.title,
                 color = MaterialTheme.colorScheme.background,
-                fontSize = 16.sp
+                fontSize = 18.sp,
+                modifier = Modifier.weight(1f)
             )
             Text(
                 text = songData.basicInfo.artist,
                 color = MaterialTheme.colorScheme.background,
                 fontSize = 6.sp,
+                modifier = Modifier.weight(7f)
             )
         }
         when (songData.type) {

@@ -1,6 +1,8 @@
 package org.plantalpha.maimaidata.domain.model
 
+import androidx.annotation.DrawableRes
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.plantalpha.maimaidata.R
 
 data class Song(
     val id: Int,
@@ -20,7 +22,7 @@ data class Song(
     data class BasicInfo(
         val bpm: Int,
         val artist: String,
-        val genre: String,
+        val genre: SongGenre,
         val version: String,
         @JsonProperty("jp_version")
         val jpVersion: String,
@@ -56,10 +58,10 @@ data class Song(
         val `break`: Int
     )
 
-    enum class Type {
-        SD,
-        DX,
-        UTAGE
+    enum class Type(@DrawableRes val res: Int?) {
+        SD(R.drawable.ic_song_type_sd),
+        DX(R.drawable.ic_song_type_dx),
+        UTAGE(null)
     }
 
     companion object {
@@ -70,11 +72,11 @@ data class Song(
             "TEST",
             Type.DX,
             0,
-            listOf("2333", "test"),
+            listOf("2333", "test","E2we1", "E2eada", "Ed144", "Edwqdi", "Edwqdi", "Edwqdi", "Edwqdi"),
             BasicInfo(
                 114,
                 "Test artist",
-                "niconico & VOCALOID",
+                SongGenre.NICO_NICO,
                 "1",
                 "1.1",
                 true,
