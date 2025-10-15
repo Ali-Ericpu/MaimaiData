@@ -1,9 +1,10 @@
-package org.plantalpha.maimaidata.feature.home.component
+package org.plantalpha.maimaidata.feature.song.component
 
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,10 +46,14 @@ import org.plantalpha.maimaidata.ui.theme.chartsScoreColors
 
 @Preview
 @Composable
-fun SongCard(songData: Song = Song.song) {
+fun SongCard(
+    songData: Song = Song.song,
+    onClick: () -> Unit = { }
+) {
     val theme = songData.basicInfo.genre.theme
     ConstraintLayout(
         modifier = Modifier
+            .clickable { onClick() }
             .padding(4.dp)
             .fillMaxWidth()
             .padding(16.dp)

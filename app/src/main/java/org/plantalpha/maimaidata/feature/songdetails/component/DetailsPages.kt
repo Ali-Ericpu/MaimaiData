@@ -47,11 +47,10 @@ import kotlin.math.abs
 @Preview
 @Composable
 fun DetailsPages(
+    song: Song = Song.song,
     tabs: List<String> = listOf("MAS", "EXP", "ADV", "BAS"),
-    charts: List<Song.Chart> = emptyList(),
-    songDetailList: List<Int> = listOf(1, 2, 3, 12),
 ) {
-    val pagerState = rememberPagerState { songDetailList.size }
+    val pagerState = rememberPagerState { song.charts.size }
     val coroutineScope = rememberCoroutineScope()
     Column(
         modifier = Modifier
@@ -88,27 +87,21 @@ fun DetailsPages(
                     LabelToText("铺面作者", "打卡为代表的帮我", color)
                     LabelToText("达成状态", "暂无成绩", color)
                 }
-                //TODO temp
-                val nodes = mapOf(
-                    "Tab" to  442,
-                    "Hold" to 68,
-                    "Slide" to 53,
-                    "Torch" to 41,
-                    "Break" to 30,
-                )
                 val maxValue = mapOf(
-                    "Total" to  1000,
-                    "Tab" to  1000,
+                    "Total" to 1000,
+                    "Tab" to 1000,
                     "Hold" to 1000,
                     "Slide" to 1000,
                     "Torch" to 1000,
                     "Break" to 1000,
                 )
-                item {
-                    ScoreSlider("Total", 442, maxValue["Total"]!!)
-                }
-                items(nodes.toList()) { (label, score) ->
-                    ScoreSlider(label, score, maxValue[label]!!)
+                items(song.charts[pagerState.currentPage].notes.entries) { (label, value) ->
+                    ScoreSlider(
+                        label = label,
+                        score = value,
+                        maxScore = maxValue[label]!!,
+                        color = song.basicInfo.genre.theme
+                    )
                 }
             }
         }

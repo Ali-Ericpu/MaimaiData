@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 import org.plantalpha.maimaidata.R
 import org.plantalpha.maimaidata.domain.model.Song
 import org.plantalpha.maimaidata.extension.toast
-import org.plantalpha.maimaidata.feature.home.component.songImagePainter
+import org.plantalpha.maimaidata.feature.song.component.songImagePainter
 
 @Preview
 @Composable

@@ -57,7 +57,8 @@ fun DetailsTopBar(
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = color
+            containerColor = color,
+
         )
     )
 }

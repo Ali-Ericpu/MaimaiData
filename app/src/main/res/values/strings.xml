@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">MaimaiData</string>
     <string name="copy_success">复制成功 : %1$s</string>
+    <string name="home">曲目列表</string>
+    <string name="rating">Rating相关</string>
+    <string name="song_detail">曲目详情</string>
 </resources>

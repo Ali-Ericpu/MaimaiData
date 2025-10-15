@@ -2,8 +2,10 @@ package org.plantalpha.maimaidata.domain.model
 
 import androidx.annotation.DrawableRes
 import com.fasterxml.jackson.annotation.JsonProperty
+import kotlinx.serialization.Serializable
 import org.plantalpha.maimaidata.R
 
+@Serializable
 data class Song(
     val id: Int,
     @JsonProperty("sort_id")
@@ -19,6 +21,8 @@ data class Song(
     val basicInfo: BasicInfo,
     val charts: List<Chart>,
 ) {
+
+    @Serializable
     data class BasicInfo(
         val bpm: Int,
         val artist: String,
@@ -34,12 +38,14 @@ data class Song(
         val utageInfo: UtageInfo?
     )
 
+    @Serializable
     data class UtageInfo(
         val kanji: String,
         val comment: String,
         val buddy: Boolean
     )
 
+    @Serializable
     data class Chart(
         val charter: String,
         val level: String,
@@ -50,13 +56,23 @@ data class Song(
         val notes: NoteInfo
     )
 
+    @Serializable
     data class NoteInfo(
         val tap: Int,
         val hold: Int,
         val slide: Int,
         val torch: Int?,
         val `break`: Int
-    )
+    ) {
+        val entries = listOf(
+            "Total" to tap + hold + slide + (torch ?: 0) + `break`,
+            "Tab" to tap,
+            "Hold" to hold,
+            "Slide" to slide,
+            "Torch" to (torch ?: 0),
+            "Break" to `break`
+        )
+    }
 
     enum class Type(@DrawableRes val res: Int?) {
         SD(R.drawable.ic_song_type_sd),
@@ -72,7 +88,17 @@ data class Song(
             "TEST",
             Type.DX,
             0,
-            listOf("2333", "test","E2we1", "E2eada", "Ed144", "Edwqdi", "Edwqdi", "Edwqdi", "Edwqdi"),
+            listOf(
+                "2333",
+                "test",
+                "E2we1",
+                "E2eada",
+                "Ed144",
+                "Edwqdi",
+                "Edwqdi",
+                "Edwqdi",
+                "Edwqdi"
+            ),
             BasicInfo(
                 114,
                 "Test artist",
@@ -83,7 +109,9 @@ data class Song(
                 "507c390321c312eb.png",
                 UtageInfo("test", "tttttest", true)
             ),
-            listOf()
+            listOf(
+
+            )
         )
     }
 }

@@ -34,8 +34,10 @@ import kotlin.math.roundToInt
 
 @Preview
 @Composable
-fun SongDetailsPage() {
-    val song = Song.song
+fun SongDetailsPage(
+    song: Song = Song.song,
+    onBack : () -> Unit = {}
+) {
     var maxOffsetY by remember { mutableIntStateOf(0) }
     val scrollState = remember { DetailsScrollState(0, 0) }
     val flingBehavior = ScrollableDefaults.flingBehavior()
@@ -44,7 +46,8 @@ fun SongDetailsPage() {
             DetailsTopBar(
                 title = song.title,
                 artist = song.basicInfo.artist,
-                color = song.basicInfo.genre.theme
+                color = song.basicInfo.genre.theme,
+                onBack = onBack
             ) {
 
             }
