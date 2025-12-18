@@ -47,11 +47,11 @@ fun SongDetailsPage(
                 title = song.title,
                 artist = song.basicInfo.artist,
                 color = song.basicInfo.genre.theme,
-                onBack = onBack
+                onBack = onBack,
             ) {
-
             }
-        }
+        },
+        modifier = Modifier.fillMaxSize(),
     ) { paddingValues ->
         Column(
             Modifier
@@ -122,7 +122,7 @@ fun SongDetailsPage(
                         }
                     }
             )
-            DetailsPages()
+            DetailsPages(song)
         }
     }
 }

@@ -1,23 +1,22 @@
 package org.plantalpha.maimaidata.domain.model
 
 import androidx.annotation.DrawableRes
-import com.fasterxml.jackson.annotation.JsonProperty
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.plantalpha.maimaidata.R
 
 @Serializable
 data class Song(
     val id: Int,
-    @JsonProperty("sort_id")
+    @SerialName("sort_id")
     val sortId: Int?,
     val title: String,
-    @JsonProperty("title_kana")
+    @SerialName("title_kana")
     val titleKana: String,
     val type: Type,
-    @JsonProperty("release_time")
+    @SerialName("release_time")
     val releaseTime: Int,
-    val alias: List<String>,
-    @JsonProperty("basic_info")
+    @SerialName("basic_info")
     val basicInfo: BasicInfo,
     val charts: List<Chart>,
 ) {
@@ -28,14 +27,14 @@ data class Song(
         val artist: String,
         val genre: SongGenre,
         val version: String,
-        @JsonProperty("jp_version")
+        @SerialName("jp_version")
         val jpVersion: String,
-        @JsonProperty("is_new")
+        @SerialName("is_new")
         val isNew: Boolean,
-        @JsonProperty("image_url")
+        @SerialName("image_url")
         val imageUrl: String,
-        @JsonProperty("utage_info")
-        val utageInfo: UtageInfo?
+        @SerialName("utage_info")
+        val utageInfo: UtageInfo? = null
     )
 
     @Serializable
@@ -49,9 +48,9 @@ data class Song(
     data class Chart(
         val charter: String,
         val level: String,
-        @JsonProperty("internal_level")
+        @SerialName("internal_level")
         val internalLevel: Double,
-        @JsonProperty("old_internal_level")
+        @SerialName("old_internal_level")
         val oldInternalLevel: Double?,
         val notes: NoteInfo
     )
@@ -61,15 +60,15 @@ data class Song(
         val tap: Int,
         val hold: Int,
         val slide: Int,
-        val torch: Int?,
+        val touch: Int? = null,
         val `break`: Int
     ) {
-        val entries = listOf(
-            "Total" to tap + hold + slide + (torch ?: 0) + `break`,
+        fun entries(): List<Pair<String, Int>> = listOf(
+            "Total" to tap + hold + slide + (touch ?: 0) + `break`,
             "Tab" to tap,
             "Hold" to hold,
             "Slide" to slide,
-            "Torch" to (torch ?: 0),
+            "Touch" to (touch ?: 0),
             "Break" to `break`
         )
     }
@@ -88,17 +87,6 @@ data class Song(
             "TEST",
             Type.DX,
             0,
-            listOf(
-                "2333",
-                "test",
-                "E2we1",
-                "E2eada",
-                "Ed144",
-                "Edwqdi",
-                "Edwqdi",
-                "Edwqdi",
-                "Edwqdi"
-            ),
             BasicInfo(
                 114,
                 "Test artist",

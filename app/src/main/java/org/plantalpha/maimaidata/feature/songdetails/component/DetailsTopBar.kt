@@ -14,7 +14,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
@@ -30,14 +32,17 @@ fun DetailsTopBar(
     TopAppBar(
         title = {
             Column {
-                Text(title, fontWeight = FontWeight.ExtraBold, color = textColor)
-                Text(artist, color = textColor)
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = textColor,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(artist, fontSize = 16.sp, color = textColor, overflow = TextOverflow.Ellipsis)
             }
         },
         navigationIcon = {
-            IconButton(
-                onClick = onBack
-            ) {
+            IconButton(onBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
@@ -46,9 +51,7 @@ fun DetailsTopBar(
             }
         },
         actions = {
-            IconButton(
-                onClick = onFavorite
-            ) {
+            IconButton(onFavorite) {
                 Icon(
                     imageVector = Icons.Sharp.Favorite,
                     contentDescription = "Favorite",
@@ -58,7 +61,6 @@ fun DetailsTopBar(
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = color,
-
         )
     )
 }

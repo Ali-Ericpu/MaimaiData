@@ -1,18 +1,32 @@
 package org.plantalpha.maimaidata.network
 
-import org.plantalpha.maimaidata.util.JsonUtil
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
-import retrofit2.converter.jackson.JacksonConverterFactory
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 object Networker {
     const val BASE_URL = "https://maimaidata.violetc.net/"
     const val IMAGE_URL = "https://maimai.wahlap.com/maimai-mobile/img/Music/"
+    const val DATA_BASE_VERSION = 3
 
-    private val service =  Retrofit.Builder()
+    private val json = Json {
+        ignoreUnknownKeys = true
+        coerceInputValues = true
+    }
+
+    private val service = Retrofit.Builder()
         .baseUrl(BASE_URL)
-        .addConverterFactory(JacksonConverterFactory.create(JsonUtil.mapper))
+        .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
         .build()
         .create(NetworkService::class.java)
+
+    suspend fun getDataVersion(): String {
+        val version = service.getDataVersion()
+        val versionStr = version[DATA_BASE_VERSION.toString()]!!.version
+        return versionStr
+    }
+
 
     suspend fun getUpdateInfo() = service.getUpdateInfo()
 

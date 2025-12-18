@@ -4,4 +4,11 @@
     <string name="home">曲目列表</string>
     <string name="rating">Rating相关</string>
     <string name="song_detail">曲目详情</string>
+    <string name="version_err">获取版本信息失败</string>
+    <string name="cancel">取消</string>
+    <string name="confirm">确认</string>
+    <string name="new_version_detected">检测到新数据版本</string>
+    <string name="already_latest_version">已是最新版本</string>
+    <string name="update">更新</string>
+    <string name="update_data_version_content">"当前数据版本: %s\n检测到新版本: %s\n是否需要更新?"</string>
 </resources>

@@ -1,7 +1,5 @@
 package org.plantalpha.maimaidata.feature.songdetails.component
 
-import androidx.annotation.FloatRange
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,33 +14,25 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabPosition
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import org.plantalpha.maimaidata.domain.model.Song
-import kotlin.math.abs
 
 @Preview
 @Composable
@@ -56,11 +46,19 @@ fun DetailsPages(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        TabRow(
+        SecondaryTabRow(
             modifier = Modifier
                 .fillMaxWidth(),
             selectedTabIndex = pagerState.currentPage,
-            indicator = { PagerTabIndicator(it, pagerState) }
+            indicator = {
+                TabRowDefaults.SecondaryIndicator(
+                    modifier = Modifier.tabIndicatorOffset(
+                        pagerState.currentPage,
+                        matchContentSize = false
+                    ),
+                    color = song.basicInfo.genre.theme
+                )
+            }
         ) {
             tabs.forEachIndexed { index, tab ->
                 Tab(
@@ -92,10 +90,10 @@ fun DetailsPages(
                     "Tab" to 1000,
                     "Hold" to 1000,
                     "Slide" to 1000,
-                    "Torch" to 1000,
+                    "Touch" to 1000,
                     "Break" to 1000,
                 )
-                items(song.charts[pagerState.currentPage].notes.entries) { (label, value) ->
+                items(song.charts[pagerState.currentPage].notes.entries()) { (label, value) ->
                     ScoreSlider(
                         label = label,
                         score = value,
@@ -107,45 +105,6 @@ fun DetailsPages(
         }
 
     }
-}
-
-@Composable
-fun PagerTabIndicator(
-    tabPositions: List<TabPosition>,
-    pagerState: PagerState,
-    color: Color = Color.DarkGray,
-    @FloatRange(from = 0.0, to = 1.0) percent: Float = 0.3f,
-    height: Dp = 5.dp,
-) {
-    val currentPage by rememberUpdatedState(newValue = pagerState.currentPage)
-    val fraction by rememberUpdatedState(newValue = pagerState.currentPageOffsetFraction)
-    val currentTab = tabPositions[currentPage]
-    val previousTab = tabPositions.getOrNull(currentPage - 1)
-    val nextTab = tabPositions.getOrNull(currentPage + 1)
-    Canvas(
-        modifier = Modifier.fillMaxSize(),
-        onDraw = {
-            val indicatorWidth = currentTab.width.toPx() * percent
-            val indicatorOffset = if (fraction > 0 && nextTab != null) {
-                lerp(currentTab.left, nextTab.left, fraction).toPx()
-            } else if (fraction < 0 && previousTab != null) {
-                lerp(currentTab.left, previousTab.left, -fraction).toPx()
-            } else {
-                currentTab.left.toPx()
-            }
-
-            val canvasHeight = size.height
-            drawRoundRect(
-                color = color,
-                topLeft = Offset(
-                    indicatorOffset + (currentTab.width.toPx() * (1 - percent) / 2),
-                    canvasHeight - height.toPx()
-                ),
-                size = Size(indicatorWidth + indicatorWidth * abs(fraction), height.toPx()),
-                cornerRadius = CornerRadius(50f)
-            )
-        }
-    )
 }
 
 @Preview
@@ -176,7 +135,8 @@ fun ScoreSlider(
                 .weight(7f)
                 .fillMaxSize()
                 .padding(vertical = 4.dp, horizontal = 12.dp)
-                .background(Color.LightGray, RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.LightGray)
         ) {
             Spacer(
                 modifier = Modifier
