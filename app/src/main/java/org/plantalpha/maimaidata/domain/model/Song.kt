@@ -101,5 +101,33 @@ data class Song(
 
             )
         )
+        val versions = listOf(
+            "maimai",
+            "FiNALE",
+            "GreeN",
+            "GreeN PLUS",
+            "ORANGE",
+            "ORANGE PLUS",
+            "PiNK",
+            "PiNK PLUS",
+            "MURASAKi",
+            "MURASAKi PLUS",
+            "MiLK",
+            "MiLK PLUS",
+            "舞萌DX",
+            "舞萌DX 2021",
+            "舞萌DX 2022",
+            "舞萌DX 2023",
+            "舞萌DX 2024",
+            "舞萌DX 2025"
+        )
     }
+
+    @Serializable
+    data class Search(
+        val text: String,
+        val favor: Boolean,
+        val genre: List<SongGenre>,
+        val version: List<String>
+    )
 }

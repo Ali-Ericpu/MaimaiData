@@ -22,9 +22,7 @@ object Networker {
         .create(NetworkService::class.java)
 
     suspend fun getDataVersion(): String {
-        val version = service.getDataVersion()
-        val versionStr = version[DATA_BASE_VERSION.toString()]!!.version
-        return versionStr
+        return service.getDataVersion()[DATA_BASE_VERSION.toString()]!!.version
     }
 
 

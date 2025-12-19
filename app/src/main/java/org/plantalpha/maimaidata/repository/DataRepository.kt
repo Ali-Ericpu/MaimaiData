@@ -9,6 +9,12 @@ class DataRepository @Inject constructor(val dataStoreManager: DataStoreManager)
         dataStoreManager.saveVersion(version)
     }
 
+    suspend fun saveSearchHistory(history: Collection<String>) {
+        dataStoreManager.saveSearchHistory(history)
+    }
+
     fun getVersion(): Flow<String> = dataStoreManager.versionFlow()
+
+    fun getSearchHistory(): Flow<Set<String>> = dataStoreManager.searchHistoryFlow()
 
 }

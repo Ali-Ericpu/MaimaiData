@@ -1,10 +1,11 @@
 package org.plantalpha.maimaidata.feature.song.component
 
+import android.content.ClipData
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +32,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -39,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import coil3.compose.rememberAsyncImagePainter
+import kotlinx.coroutines.launch
 import org.plantalpha.maimaidata.R
 import org.plantalpha.maimaidata.domain.model.Song
 import org.plantalpha.maimaidata.network.Networker
@@ -51,14 +56,25 @@ fun SongCard(
     onClick: () -> Unit = { }
 ) {
     val theme = songData.basicInfo.genre.theme
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
     ConstraintLayout(
         modifier = Modifier
-            .clickable { onClick() }
             .padding(4.dp)
             .fillMaxWidth()
             .padding(16.dp)
             .height(180.dp)
             .background(MaterialTheme.colorScheme.background, RoundedCornerShape(16.dp))
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = {
+                    scope.launch {
+                        clipboard.setClipEntry(
+                            ClipData.newPlainText("Song Name", songData.title).toClipEntry()
+                        )
+                    }
+                }
+            )
     ) {
         val (imageRef, titleRef, scoreRef, typeRef, genreRef, backgroundRef, themeColorRef) = createRefs()
         Spacer(
@@ -227,5 +243,8 @@ fun ChartLevelRow(
 @Composable
 fun songImagePainter(imageId: String): Painter {
     Log.d("IMAGE", "songImagePainter: ${Networker.IMAGE_URL}$imageId")
-    return rememberAsyncImagePainter(Networker.IMAGE_URL + imageId)
+    return rememberAsyncImagePainter(
+        model = Networker.IMAGE_URL + imageId,
+        placeholder = painterResource(R.drawable.ic_loading)
+    )
 }

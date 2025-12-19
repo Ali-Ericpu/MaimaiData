@@ -11,4 +11,7 @@
     <string name="already_latest_version">已是最新版本</string>
     <string name="update">更新</string>
     <string name="update_data_version_content">"当前数据版本: %s\n检测到新版本: %s\n是否需要更新?"</string>
+    <string name="search">搜索</string>
+    <string name="search_history">"搜索历史"</string>
+    <string name="favor_song">"收藏的歌曲"</string>
 </resources>
