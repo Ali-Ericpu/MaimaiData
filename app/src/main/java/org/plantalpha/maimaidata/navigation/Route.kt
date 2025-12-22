@@ -13,7 +13,7 @@ sealed class Route(@StringRes val desc: Int) : NavKey {
     data object Home: Route(R.string.home)
 
     @Serializable
-    data class SongDetail(val song: Song): Route(R.string.song_detail)
+    data class SongDetail(val song: Song, val alias: List<String>): Route(R.string.song_detail)
 
     @Serializable
     data object Rating : Route(R.string.rating)

@@ -21,7 +21,7 @@ import org.plantalpha.maimaidata.feature.song.viewmodel.SongListViewModel
 @Composable
 fun SongListPage(
     viewModel: SongListViewModel = hiltViewModel(),
-    navToDetail: (Song) -> Unit = { }
+    navToDetail: (Song, List<String>) -> Unit = { _, _ -> }
 ) {
     val songs by viewModel.sortedSongList.collectAsStateWithLifecycle()
     val showUpdateDialog by viewModel.showUpdateDialog.collectAsStateWithLifecycle()
@@ -37,7 +37,8 @@ fun SongListPage(
         Column(modifier = Modifier.fillMaxSize()) {
             SongTopBar(viewModel::changeSearchState) {
                 if (songs.isNotEmpty()) {
-                    navToDetail(songs.random())
+                    val song = songs.random()
+                    navToDetail(song, viewModel.getAlias(song.id))
                 }
             }
             AnimatedVisibility(isSearching) {
@@ -51,7 +52,7 @@ fun SongListPage(
             }
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(songs) { song ->
-                    SongCard(song) { navToDetail(song) }
+                    SongCard(song) { navToDetail(song, viewModel.getAlias(song.id)) }
                 }
             }
         }

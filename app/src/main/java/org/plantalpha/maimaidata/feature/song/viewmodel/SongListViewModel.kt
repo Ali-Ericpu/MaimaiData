@@ -30,6 +30,8 @@ class SongListViewModel @Inject constructor(
 
     private var songList = listOf<Song>()
 
+    private val aliasData = mutableMapOf<Int, List<String>>()
+
     private val _sortedSongList = MutableStateFlow(listOf<Song>())
     val sortedSongList = _sortedSongList.asStateFlow()
 
@@ -80,7 +82,7 @@ class SongListViewModel @Inject constructor(
                 }
             }.onFailure {
                 Log.d("ERROR", "Update Version Error: ${it.message}")
-                context.toast(R.string.version_err)
+                context.toast(R.string.update_version_err)
             }
             _isRefreshing.value = false
         }
@@ -95,6 +97,21 @@ class SongListViewModel @Inject constructor(
         }
     }
 
+    fun updateAliasData() {
+        viewModelScope.launch {
+            runCatching {
+                Networker.getChartAlias(version)
+            }.onSuccess {
+                it.aliases.forEach { alias ->
+                    aliasData[alias.id] = alias.alias
+                }
+            }.onFailure {
+                Log.d("ERROR", "Update Alias Data Error: ${it.message}")
+                context.toast(R.string.update_alias_err)
+            }
+        }
+    }
+
     fun loadSongData() = viewModelScope.launch {
         TODO("From Room DB")
     }
@@ -102,6 +119,7 @@ class SongListViewModel @Inject constructor(
     fun updateSongData() = viewModelScope.launch {
         songList = Networker.getSongList(URLEncoder.encode(version, "UTF-8"))
         _sortedSongList.value = songList.sortedBy { it.sortId }
+        updateAliasData()
         _searchData.value = Song.Search("", false, emptyList(), emptyList())
     }
 
@@ -130,4 +148,6 @@ class SongListViewModel @Inject constructor(
     fun cleanSearchHistory() = viewModelScope.launch {
         dataRepository.saveSearchHistory(emptySet())
     }
+
+    fun getAlias(id: Int): List<String> = aliasData[id] ?: emptyList()
 }

@@ -36,6 +36,7 @@ import kotlin.math.roundToInt
 @Composable
 fun SongDetailsPage(
     song: Song = Song.song,
+    alias: List<String> = emptyList(),
     onBack : () -> Unit = {}
 ) {
     var maxOffsetY by remember { mutableIntStateOf(0) }
@@ -110,6 +111,7 @@ fun SongDetailsPage(
         ) {
             DetailsInfo(
                 song = song,
+                alias = alias,
                 modifier = Modifier
                     .layout { measurable, constraints ->
                         val placeable = measurable.measure(constraints)

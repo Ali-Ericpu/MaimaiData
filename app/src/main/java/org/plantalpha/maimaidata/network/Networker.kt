@@ -28,6 +28,8 @@ object Networker {
 
     suspend fun getUpdateInfo() = service.getUpdateInfo()
 
+    suspend fun getChartAlias(version: String) = service.getChartAlias(version)
+
     suspend fun getSongList(version: String) = service.getSongList(version)
 
 }

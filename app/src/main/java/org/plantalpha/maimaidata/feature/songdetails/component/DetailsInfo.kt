@@ -1,7 +1,9 @@
 package org.plantalpha.maimaidata.feature.songdetails.component
 
+import android.content.ClipData
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -12,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,21 +26,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import org.plantalpha.maimaidata.R
 import org.plantalpha.maimaidata.domain.model.Song
+import org.plantalpha.maimaidata.extension.toast
 import org.plantalpha.maimaidata.feature.song.component.songImagePainter
 
 @Preview
 @Composable
 fun DetailsInfo(
     modifier: Modifier = Modifier,
-    song: Song = Song.song
+    song: Song = Song.song,
+    alias: List<String> = emptyList()
 ) {
     val clipboard = LocalClipboard.current
     val context = LocalContext.current
@@ -74,9 +82,10 @@ fun DetailsInfo(
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
+        val aliasLabel = stringResource(R.string.song_alias)
         FlowRow {
             Text(
-                text = "歌曲别名",
+                text = aliasLabel,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.background,
                 modifier = Modifier
@@ -84,30 +93,30 @@ fun DetailsInfo(
                     .align(Alignment.CenterVertically)
             )
             val message = stringResource(R.string.copy_success)
-//            song.alias.forEach { alias ->
-//
-//                Text(
-//                    text = alias,
-//                    color = song.basicInfo.genre.theme,
-//                    modifier = Modifier
-//                        .wrapContentSize()
-//                        .padding(4.dp)
-//                        .background(MaterialTheme.colorScheme.background, RoundedCornerShape(16.dp))
-//                        .combinedClickable(
-//                            enabled = true,
-//                            onClick = { },
-//                            onLongClick = {
-//                                coroutineScope.launch {
-//                                    clipboard.setClipEntry(
-//                                        ClipData.newPlainText("", alias).toClipEntry()
-//                                    )
-//                                }
-//                                context.toast(message.format(alias))
-//                            }
-//                        )
-//                        .padding(start = 6.dp, end = 6.dp, top = 4.dp, bottom = 4.dp))
-//
-//            }
+            alias.forEach { alias ->
+                Text(
+                    text = alias,
+                    color = song.basicInfo.genre.theme,
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .padding(4.dp)
+                        .background(MaterialTheme.colorScheme.background, RoundedCornerShape(16.dp))
+                        .combinedClickable(
+                            enabled = true,
+                            indication = null,
+                            interactionSource = null,
+                            onClick = { },
+                            onLongClick = {
+                                coroutineScope.launch {
+                                    clipboard.setClipEntry(
+                                        ClipData.newPlainText(aliasLabel, alias).toClipEntry()
+                                    )
+                                }
+                                context.toast(message.format(alias))
+                            }
+                        )
+                        .padding(horizontal = 6.dp, vertical = 4.dp))
+            }
         }
     }
 }
@@ -121,6 +130,7 @@ fun LabelToText(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
@@ -128,10 +138,11 @@ fun LabelToText(
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = color,
-            modifier = Modifier.weight(2f)
+            modifier = Modifier.weight(1.65f)
         )
         Text(
             text = text,
+            fontSize = 14.sp,
             maxLines = 1,
             color = color,
             modifier = Modifier.weight(4f)

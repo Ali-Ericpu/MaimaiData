@@ -25,7 +25,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -40,7 +40,6 @@ android {
         compose = true
     }
 }
-
 kotlin {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_17

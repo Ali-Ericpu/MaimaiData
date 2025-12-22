@@ -1,7 +1,6 @@
 package org.plantalpha.maimaidata.feature.song.component
 
-import androidx.activity.addCallback
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -59,11 +59,6 @@ fun SongSearchBar(
     var isFavor by remember { mutableStateOf(searchData.favor) }
     val genreList = remember { mutableStateListOf(*searchData.genre.toTypedArray()) }
     val versionList = remember { mutableStateListOf(*searchData.version.toTypedArray()) }
-    LocalOnBackPressedDispatcherOwner.current?.let { dispatcher ->
-        dispatcher.onBackPressedDispatcher.addCallback {
-            onBack()
-        }
-    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -154,9 +149,23 @@ fun SongSearchBar(
         }
         BubbleText(
             text = stringResource(R.string.favor_song),
-            color = if (isFavor) Color(0xFFF08080) else Color.LightGray
+            color = if (isFavor) Color(0xFFF08080) else Color.LightGray,
+            modifier = Modifier.padding(vertical = 12.dp, horizontal = 4.dp)
         ) {
             isFavor = !isFavor
+        }
+        BottomButton(
+            onReset = {
+                isFavor = false
+                genreList.clear()
+                versionList.clear()
+                onSearch(Song.Search("", isFavor, genreList, versionList))
+            }
+        ) {
+            onSearch(Song.Search(query, isFavor, genreList, versionList))
+        }
+        BackHandler {
+            onBack()
         }
     }
 }
@@ -192,4 +201,25 @@ fun BubbleText(
             )
             .wrapContentSize()
     )
+}
+
+@Composable
+private fun BottomButton(
+    modifier: Modifier = Modifier,
+    onReset: () -> Unit,
+    onSearch: () -> Unit
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Button(onReset) {
+            Text(stringResource(R.string.reset))
+        }
+        Button(onSearch) {
+            Text(stringResource(R.string.search))
+        }
+    }
+
 }

@@ -84,12 +84,12 @@ fun NavigationRoute(navBackStack: NavBackStack<in NavKey>, modifier: Modifier = 
         ),
         entryProvider = entryProvider {
             entry<Route.Home> {
-                SongListPage {
-                    navBackStack.add(Route.SongDetail(it))
+                SongListPage { song, alias ->
+                    navBackStack.add(Route.SongDetail(song, alias))
                 }
             }
             entry<Route.SongDetail> {
-                SongDetailsPage(it.song) {
+                SongDetailsPage(it.song, it.alias) {
                     navBackStack.removeLastOrNull()
                 }
             }
