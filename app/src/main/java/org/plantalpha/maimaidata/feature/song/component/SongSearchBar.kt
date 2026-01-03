@@ -44,6 +44,7 @@ import androidx.compose.ui.util.fastForEach
 import org.plantalpha.maimaidata.R
 import org.plantalpha.maimaidata.domain.model.Song
 import org.plantalpha.maimaidata.domain.model.SongGenre
+import org.plantalpha.maimaidata.domain.model.SongVersion
 
 @Preview
 @Composable
@@ -88,7 +89,6 @@ fun SongSearchBar(
             singleLine = true,
             modifier = modifier
                 .fillMaxWidth()
-
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -134,12 +134,12 @@ fun SongSearchBar(
                 .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
                 .padding(4.dp)
         ) {
-            Song.versions.fastForEach { version ->
+            SongVersion.commonEntries.fastForEach { version ->
                 val color = if (version in versionList)
                     MaterialTheme.colorScheme.primary
                 else
                     Color.LightGray
-                BubbleText(Modifier.weight(1f), version, color) {
+                BubbleText(Modifier.weight(1f), version.value, color) {
                     if (version in versionList)
                         versionList.remove(version)
                     else

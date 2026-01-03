@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
@@ -27,42 +28,48 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import org.plantalpha.maimaidata.R
 import org.plantalpha.maimaidata.domain.model.Song
 
 @Preview
 @Composable
 fun DetailsPages(
     song: Song = Song.song,
-    tabs: List<String> = listOf("MAS", "EXP", "ADV", "BAS"),
+    tabs: List<String> = listOf("MAS", "EXP", "ADV", "BAS", "Re:MAS"),
 ) {
     val pagerState = rememberPagerState { song.charts.size }
     val coroutineScope = rememberCoroutineScope()
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
+    Column(modifier = Modifier.fillMaxSize()) {
         SecondaryTabRow(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             selectedTabIndex = pagerState.currentPage,
             indicator = {
                 TabRowDefaults.SecondaryIndicator(
                     modifier = Modifier.tabIndicatorOffset(
                         pagerState.currentPage,
-                        matchContentSize = false
+                        matchContentSize = true
                     ),
                     color = song.basicInfo.genre.theme
                 )
             }
         ) {
-            tabs.forEachIndexed { index, tab ->
+            song.charts.forEachIndexed { index, _ ->
                 Tab(
-                    text = { Text(tab) },
+                    text = {
+                        Text(
+                            text = tabs[index],
+                            textAlign = TextAlign.Center,
+                            softWrap = false,
+                            overflow = TextOverflow.Visible,
+                        )
+                    },
                     selected = pagerState.currentPage == index,
                     onClick = {
                         coroutineScope.launch {
@@ -78,12 +85,36 @@ fun DetailsPages(
                     .fillMaxSize()
                     .padding(12.dp)
             ) {
+                val chart = song.charts[pagerState.currentPage]
                 item {
                     val color = MaterialTheme.colorScheme.onBackground
-                    LabelToText("等级", "12.9", color)
-                    LabelToText("拟合定数", "-", color)
-                    LabelToText("铺面作者", "打卡为代表的帮我", color)
-                    LabelToText("达成状态", "暂无成绩", color)
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        LabelToText(
+                            stringResource(R.string.level),
+                            chart.level,
+                            color = color,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 20.dp)
+                        )
+                        Spacer(modifier = Modifier.weight(0.4f))
+                        LabelToText(
+                            stringResource(R.string.internal_level),
+                            chart.internalLevel.toString(),
+                            color = color,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    LabelToText(stringResource(R.string.author), chart.charter, color = color)
+                    LabelToText(
+                        stringResource(R.string.state),
+                        stringResource(R.string.none_score),
+                        color = color
+                    )
                 }
                 val maxValue = mapOf(
                     "Total" to 1000,
@@ -93,7 +124,7 @@ fun DetailsPages(
                     "Touch" to 1000,
                     "Break" to 1000,
                 )
-                items(song.charts[pagerState.currentPage].notes.entries()) { (label, value) ->
+                items(chart.notes.entries()) { (label, value) ->
                     ScoreSlider(
                         label = label,
                         score = value,
@@ -127,8 +158,9 @@ fun ScoreSlider(
             text = label,
             color = textColor,
             textAlign = TextAlign.End,
-            fontSize = 14.sp,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .wrapContentWidth()
+                .weight(1.2f)
         )
         Box(
             modifier = Modifier
@@ -150,7 +182,7 @@ fun ScoreSlider(
             color = textColor,
             textAlign = TextAlign.Start,
             fontSize = 14.sp,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(0.8f)
         )
     }
 }

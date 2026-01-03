@@ -12,9 +12,19 @@
     <string name="new_version_detected">检测到新数据版本</string>
     <string name="already_latest_version">已是最新版本</string>
     <string name="update">更新</string>
-    <string name="update_data_version_content">"当前数据版本: %s\n检测到新版本: %s\n是否需要更新?"</string>
+    <string name="update_data_version_content">当前数据版本: %s\n检测到新版本: %s\n是否需要更新?</string>
     <string name="search">搜索</string>
-    <string name="search_history">"搜索历史"</string>
-    <string name="favor_song">"收藏的歌曲"</string>
-    <string name="reset">"重置"</string>
+    <string name="search_history">搜索历史</string>
+    <string name="favor_song">收藏的歌曲</string>
+    <string name="reset">重置</string>
+    <string name="empty">""</string>
+    <string name="bpm">BPM</string>
+    <string name="song_genre">歌曲分类</string>
+    <string name="song_version">添加版本</string>
+    <string name="song_id">歌曲ID</string>
+    <string name="level">等级</string>
+    <string name="internal_level">拟合定数</string>
+    <string name="author">谱面作者</string>
+    <string name="state">达成状态</string>
+    <string name="none_score">暂无成绩</string>
 </resources>

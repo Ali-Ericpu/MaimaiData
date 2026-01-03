@@ -14,18 +14,25 @@ import kotlinx.coroutines.launch
 import org.plantalpha.maimaidata.R
 import org.plantalpha.maimaidata.domain.model.Song
 import org.plantalpha.maimaidata.extension.toast
-import org.plantalpha.maimaidata.network.Networker
+import org.plantalpha.maimaidata.network.SongApi
 import org.plantalpha.maimaidata.repository.DataRepository
+import org.plantalpha.maimaidata.repository.SongDatabase
+import org.plantalpha.maimaidata.util.Constants.DATA_BASE_VERSION
 import java.net.URLEncoder
 import javax.inject.Inject
 
 @HiltViewModel
 class SongListViewModel @Inject constructor(
     val dataRepository: DataRepository,
+    val songDatabase: SongDatabase,
+    val songApi: SongApi,
     @ApplicationContext val context: Context
 ) : ViewModel() {
 
-    private var version = ""
+    private val songDao = songDatabase.songDao()
+
+    private val version = dataRepository.getVersion()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, "")
     private var latestVersion = ""
 
     private var songList = listOf<Song>()
@@ -52,18 +59,12 @@ class SongListViewModel @Inject constructor(
 
     val updateContent
         get() = context.getString(R.string.update_data_version_content)
-            .format(version.ifEmpty { "无" }, latestVersion)
+            .format(version.value.ifEmpty { "无" }, latestVersion)
 
     init {
         viewModelScope.launch {
-            dataRepository.saveVersion("")  //测试使用
-            launch {
-                dataRepository.getVersion().collect {
-                    version = it
-                    Log.d("VERSION", "DataVersion: $it")
-                }
-            }
             checkDataVersion()
+            loadSongData()
         }
     }
 
@@ -71,13 +72,13 @@ class SongListViewModel @Inject constructor(
         viewModelScope.launch {
             _isRefreshing.value = true
             runCatching {
-                Networker.getDataVersion()
-            }.onSuccess {
-                if (version != it) {
-                    latestVersion = it
+                songApi.getDataVersion()[DATA_BASE_VERSION.toString()]!!.version
+            }.onSuccess { dataVersion ->
+                if (version.value != dataVersion) {
+                    latestVersion = dataVersion
                     _showUpdateDialog.value = true
-                    Log.d("VERSION", "Latest DataVersion: $it")
-                } else {
+                    Log.d("VERSION", "Latest DataVersion: $dataVersion")
+                } else if (songList.isNotEmpty()){
                     context.toast(R.string.already_latest_version)
                 }
             }.onFailure {
@@ -90,7 +91,7 @@ class SongListViewModel @Inject constructor(
 
     fun updateVersion() {
         viewModelScope.launch {
-            if (latestVersion.isNotEmpty() && latestVersion != version) {
+            if (latestVersion.isNotEmpty() && latestVersion != version.value) {
                 dataRepository.saveVersion(latestVersion)
                 updateSongData()
             }
@@ -100,7 +101,7 @@ class SongListViewModel @Inject constructor(
     fun updateAliasData() {
         viewModelScope.launch {
             runCatching {
-                Networker.getChartAlias(version)
+                songApi.getChartAlias(version.value)
             }.onSuccess {
                 it.aliases.forEach { alias ->
                     aliasData[alias.id] = alias.alias
@@ -113,11 +114,20 @@ class SongListViewModel @Inject constructor(
     }
 
     fun loadSongData() = viewModelScope.launch {
-        TODO("From Room DB")
+        _isRefreshing.value = true
+        songList = songDao.getAll()
+        if (songList.isNotEmpty()) {
+            updateAliasData()
+        }
+        _sortedSongList.value = songList.sortedBy { it.sortId }
+        _isRefreshing.value = false
     }
 
     fun updateSongData() = viewModelScope.launch {
-        songList = Networker.getSongList(URLEncoder.encode(version, "UTF-8"))
+        Log.d("UPDATE", "updateSongData: ${version.value}")
+        songList = songApi.getSongList(URLEncoder.encode(version.value, "UTF-8"))
+        songDao.deleteAll()
+        songDao.insertAll(songList)
         _sortedSongList.value = songList.sortedBy { it.sortId }
         updateAliasData()
         _searchData.value = Song.Search("", false, emptyList(), emptyList())

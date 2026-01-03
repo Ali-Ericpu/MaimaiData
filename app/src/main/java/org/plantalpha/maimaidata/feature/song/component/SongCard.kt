@@ -46,8 +46,8 @@ import coil3.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
 import org.plantalpha.maimaidata.R
 import org.plantalpha.maimaidata.domain.model.Song
-import org.plantalpha.maimaidata.network.Networker
 import org.plantalpha.maimaidata.ui.theme.chartsScoreColors
+import org.plantalpha.maimaidata.util.Constants
 
 @Preview
 @Composable
@@ -133,7 +133,7 @@ fun SongCard(
             Text(
                 text = songData.basicInfo.artist,
                 color = MaterialTheme.colorScheme.background,
-                fontSize = 6.sp,
+                fontSize = 10.sp,
                 modifier = Modifier.weight(7f)
             )
         }
@@ -242,9 +242,9 @@ fun ChartLevelRow(
 
 @Composable
 fun songImagePainter(imageId: String): Painter {
-    Log.d("IMAGE", "songImagePainter: ${Networker.IMAGE_URL}$imageId")
+    Log.d("IMAGE", "songImagePainter: ${Constants.IMAGE_URL}$imageId")
     return rememberAsyncImagePainter(
-        model = Networker.IMAGE_URL + imageId,
+        model = Constants.IMAGE_URL + imageId,
         placeholder = painterResource(R.drawable.ic_loading)
     )
 }

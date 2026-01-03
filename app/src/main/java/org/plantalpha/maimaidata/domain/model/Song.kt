@@ -1,12 +1,22 @@
 package org.plantalpha.maimaidata.domain.model
 
 import androidx.annotation.DrawableRes
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import org.plantalpha.maimaidata.R
+import org.plantalpha.maimaidata.domain.model.Song.ChartTypeConvert
 
+@Entity
 @Serializable
+@TypeConverters(ChartTypeConvert::class)
 data class Song(
+    @PrimaryKey
     val id: Int,
     @SerialName("sort_id")
     val sortId: Int?,
@@ -17,8 +27,9 @@ data class Song(
     @SerialName("release_time")
     val releaseTime: Int,
     @SerialName("basic_info")
+    @Embedded
     val basicInfo: BasicInfo,
-    val charts: List<Chart>,
+    val charts: List<Chart>
 ) {
 
     @Serializable
@@ -26,14 +37,15 @@ data class Song(
         val bpm: Int,
         val artist: String,
         val genre: SongGenre,
-        val version: String,
+        val version: SongVersion,
         @SerialName("jp_version")
-        val jpVersion: String,
+        val jpVersion: SongVersion,
         @SerialName("is_new")
         val isNew: Boolean,
         @SerialName("image_url")
         val imageUrl: String,
         @SerialName("utage_info")
+        @Embedded
         val utageInfo: UtageInfo? = null
     )
 
@@ -91,8 +103,8 @@ data class Song(
                 114,
                 "Test artist",
                 SongGenre.NICO_NICO,
-                "1",
-                "1.1",
+                SongVersion.MAIMAI,
+                SongVersion.MAIMAI_PLUS,
                 true,
                 "507c390321c312eb.png",
                 UtageInfo("test", "tttttest", true)
@@ -128,6 +140,20 @@ data class Song(
         val text: String,
         val favor: Boolean,
         val genre: List<SongGenre>,
-        val version: List<String>
+        val version: List<SongVersion>
     )
+
+    class ChartTypeConvert {
+
+        @TypeConverter
+        fun toJson(value: List<Chart>): String {
+            return Json.encodeToString(value)
+        }
+
+        @TypeConverter
+        fun fromJson(value: String): List<Chart> {
+            return Json.decodeFromString(value)
+        }
+
+    }
 }

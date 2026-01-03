@@ -3,14 +3,18 @@ package org.plantalpha.maimaidata.feature.song
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import org.plantalpha.maimaidata.domain.model.Song
 import org.plantalpha.maimaidata.feature.song.component.SongCard
 import org.plantalpha.maimaidata.feature.song.component.SongSearchBar
@@ -29,10 +33,12 @@ fun SongListPage(
     val isSearching by viewModel.isSearching.collectAsStateWithLifecycle()
     val searchData by viewModel.searchData.collectAsStateWithLifecycle()
     val searchHistory by viewModel.searchHistory.collectAsStateWithLifecycle(emptySet())
+    val state = rememberLazyListState()
+    val scope = rememberCoroutineScope()
     PullToRefreshBox(
         isRefreshing = isRefreshing,
         onRefresh = viewModel::checkDataVersion,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.statusBarsPadding().fillMaxSize()
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             SongTopBar(viewModel::changeSearchState) {
@@ -46,11 +52,13 @@ fun SongListPage(
                     searchData = searchData,
                     searchHistory = searchHistory,
                     onBack = viewModel::changeSearchState,
-                    onSearch = viewModel::onSearch,
                     onCleanHistory = viewModel::cleanSearchHistory,
-                )
+                ) {
+                    scope.launch { state.animateScrollToItem(0) }
+                    viewModel.onSearch(it)
+                }
             }
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(state = state, modifier = Modifier.fillMaxSize()) {
                 items(songs) { song ->
                     SongCard(song) { navToDetail(song, viewModel.getAlias(song.id)) }
                 }

@@ -8,7 +8,7 @@ import org.plantalpha.maimaidata.domain.response.UpdateInfo
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-interface NetworkService {
+interface SongApi {
 
     @GET("update.json")
     suspend fun getUpdateInfo(): UpdateInfo
