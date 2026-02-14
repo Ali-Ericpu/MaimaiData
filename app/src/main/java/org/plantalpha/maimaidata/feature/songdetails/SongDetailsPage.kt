@@ -22,8 +22,8 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Velocity
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import org.plantalpha.maimaidata.domain.model.Song
 import org.plantalpha.maimaidata.feature.songdetails.component.DetailsInfo
 import org.plantalpha.maimaidata.feature.songdetails.component.DetailsPages
@@ -32,11 +32,11 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-@Preview
 @Composable
 fun SongDetailsPage(
     song: Song = Song.song,
     alias: List<String> = emptyList(),
+    viewModel: SongDetailsViewModel = hiltViewModel(),
     onBack : () -> Unit = {}
 ) {
     var maxOffsetY by remember { mutableIntStateOf(0) }

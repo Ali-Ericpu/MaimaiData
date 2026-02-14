@@ -50,9 +50,6 @@ fun DetailsInfo(
     song: Song = Song.song,
     alias: List<String> = emptyList()
 ) {
-    val clipboard = LocalClipboard.current
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
     Column(
         modifier = modifier
             .background(song.basicInfo.genre.theme)
@@ -71,7 +68,7 @@ fun DetailsInfo(
                     Image(
                         painter = painterResource(res),
                         contentDescription = "Type",
-                        contentScale = ContentScale.Crop,
+                        contentScale = ContentScale.Fit,
                         modifier = Modifier
                             .width(60.dp)
                             .layout { measurable, constraints ->
@@ -92,7 +89,7 @@ fun DetailsInfo(
                 LabelToText(stringResource(R.string.bpm), song.basicInfo.bpm.toString())
 //                LabelToText(stringResource(R.string.song_version), stringResource(R.string.empty))
                 Row(
-                    horizontalArrangement = Arrangement.SpaceAround,
+//                    horizontalArrangement = Arrangement,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -105,48 +102,59 @@ fun DetailsInfo(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         if (alias.isNotEmpty()) {
-            val aliasLabel = stringResource(R.string.song_alias)
-            FlowRow {
-                Text(
-                    text = aliasLabel,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.background,
-                    modifier = Modifier
-                        .padding(start = 8.dp, end = 16.dp)
-                        .align(Alignment.CenterVertically)
-                )
-                val message = stringResource(R.string.copy_success)
-                alias.forEach { alias ->
-                    Text(
-                        text = alias,
-                        color = song.basicInfo.genre.theme,
-                        fontSize = 14.sp,
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .padding(4.dp)
-                            .background(
-                                MaterialTheme.colorScheme.background,
-                                RoundedCornerShape(16.dp)
-                            )
-                            .combinedClickable(
-                                enabled = true,
-                                indication = null,
-                                interactionSource = null,
-                                onClick = { },
-                                onLongClick = {
-                                    coroutineScope.launch {
-                                        clipboard.setClipEntry(
-                                            ClipData.newPlainText(aliasLabel, alias).toClipEntry()
-                                        )
-                                        context.toast(message.format(alias))
-                                    }
-                                }
-                            )
-                            .padding(horizontal = 4.dp))
-                }
-            }
+            AliasFlowRow(alias, song.basicInfo.genre.theme)
+        }
+    }
+}
+
+@Composable
+private fun AliasFlowRow(
+    alias: List<String>,
+    color: Color = MaterialTheme.colorScheme.primary
+) {
+    val clipboard = LocalClipboard.current
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val aliasLabel = stringResource(R.string.song_alias)
+    FlowRow {
+        Text(
+            text = aliasLabel,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier
+                .padding(start = 8.dp, end = 16.dp)
+                .align(Alignment.CenterVertically)
+        )
+        val message = stringResource(R.string.copy_success)
+        alias.forEach { alias ->
+            Text(
+                text = alias,
+                color = color,
+                fontSize = 14.sp,
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(4.dp)
+                    .background(
+                        MaterialTheme.colorScheme.background,
+                        RoundedCornerShape(16.dp)
+                    )
+                    .combinedClickable(
+                        enabled = true,
+                        indication = null,
+                        interactionSource = null,
+                        onClick = { },
+                        onLongClick = {
+                            coroutineScope.launch {
+                                clipboard.setClipEntry(
+                                    ClipData.newPlainText(aliasLabel, alias).toClipEntry()
+                                )
+                                context.toast(message.format(alias))
+                            }
+                        }
+                    )
+                    .padding(horizontal = 4.dp))
         }
     }
 }
@@ -182,8 +190,7 @@ fun LabelToText(
 private fun SongVersionImage(version: SongVersion) {
     Image(
         painter = painterResource(version.res),
-        contentDescription = null,
-        contentScale = ContentScale.Fit,
+        contentDescription = stringResource(R.string.song_version),
         modifier = Modifier.height(50.dp)
     )
 }
