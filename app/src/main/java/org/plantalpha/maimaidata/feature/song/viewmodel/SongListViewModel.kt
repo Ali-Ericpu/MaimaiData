@@ -77,10 +77,10 @@ class SongListViewModel @Inject constructor(
                 if (version.value != dataVersion) {
                     latestVersion = dataVersion
                     _showUpdateDialog.value = true
-                    Log.d("VERSION", "Latest DataVersion: $dataVersion")
                 } else if (songList.isNotEmpty()){
                     context.toast(R.string.already_latest_version)
                 }
+                Log.d("VERSION", "Latest DataVersion: $dataVersion")
             }.onFailure {
                 Log.d("ERROR", "Update Version Error: ${it.message}")
                 context.toast(R.string.update_version_err)
@@ -124,6 +124,7 @@ class SongListViewModel @Inject constructor(
     }
 
     fun updateSongData() = viewModelScope.launch {
+        _isRefreshing.value = true
         Log.d("UPDATE", "updateSongData: ${version.value}")
         songList = songApi.getSongList(URLEncoder.encode(version.value, "UTF-8"))
         songDao.deleteAll()
@@ -131,6 +132,7 @@ class SongListViewModel @Inject constructor(
         _sortedSongList.value = songList.sortedBy { it.sortId }
         updateAliasData()
         _searchData.value = Song.Search("", false, emptyList(), emptyList())
+        _isRefreshing.value = false
     }
 
     fun changeShowUpdateDataDialogState() = viewModelScope.launch {

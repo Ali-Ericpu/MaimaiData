@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,6 +33,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastForEachIndexed
 import kotlinx.coroutines.launch
 import org.plantalpha.maimaidata.R
 import org.plantalpha.maimaidata.domain.model.Song
@@ -42,9 +43,10 @@ import org.plantalpha.maimaidata.domain.model.Song
 @Composable
 fun DetailsPages(
     song: Song = Song.song,
-    tabs: List<String> = listOf("MAS", "EXP", "ADV", "BAS", "Re:MAS"),
+    tabs: List<String> = listOf("MAS", "EXP", "ADV", "BAS"),
 ) {
-    val pagerState = rememberPagerState { song.charts.size }
+    val charts = song.charts.reversed()
+    val pagerState = rememberPagerState { charts.size }
     val coroutineScope = rememberCoroutineScope()
     Column(modifier = Modifier.fillMaxSize()) {
         SecondaryTabRow(
@@ -60,7 +62,7 @@ fun DetailsPages(
                 )
             }
         ) {
-            song.charts.forEachIndexed { index, _ ->
+            charts.fastForEachIndexed { index, _ ->
                 Tab(
                     text = {
                         Text(
@@ -79,14 +81,17 @@ fun DetailsPages(
                 )
             }
         }
-        HorizontalPager(pagerState, modifier = Modifier.fillMaxSize()) { index ->
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize()
+        ) { index ->
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(12.dp)
             ) {
-                val chart = song.charts[pagerState.currentPage]
                 item {
+                    val chart = charts[index]
                     val color = MaterialTheme.colorScheme.onBackground
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -101,7 +106,7 @@ fun DetailsPages(
                                 .weight(1f)
                                 .padding(end = 20.dp)
                         )
-                        Spacer(modifier = Modifier.weight(0.4f))
+                        Spacer(modifier = Modifier.weight(0.3f))
                         LabelToText(
                             stringResource(R.string.internal_level),
                             chart.internalLevel.toString(),
@@ -109,28 +114,42 @@ fun DetailsPages(
                             modifier = Modifier.weight(1f)
                         )
                     }
-                    LabelToText(stringResource(R.string.author), chart.charter, color = color)
-                    LabelToText(
-                        stringResource(R.string.state),
-                        stringResource(R.string.none_score),
-                        color = color
+                    Row {
+                        LabelToText(
+                            stringResource(R.string.author),
+                            chart.charter,
+                            color = color,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                    Row {
+                        LabelToText(
+                            stringResource(R.string.state),
+                            stringResource(R.string.none_score),
+                            color = color,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                    val maxValue = mapOf(
+                        "Total" to 1000,
+                        "Tab" to 1000,
+                        "Hold" to 1000,
+                        "Slide" to 1000,
+                        "Touch" to 1000,
+                        "Break" to 1000,
                     )
-                }
-                val maxValue = mapOf(
-                    "Total" to 1000,
-                    "Tab" to 1000,
-                    "Hold" to 1000,
-                    "Slide" to 1000,
-                    "Touch" to 1000,
-                    "Break" to 1000,
-                )
-                items(chart.notes.entries()) { (label, value) ->
-                    ScoreSlider(
-                        label = label,
-                        score = value,
-                        maxScore = maxValue[label]!!,
-                        color = song.basicInfo.genre.theme
-                    )
+                    chart.notes.entries().fastForEach { (label, value) ->
+                        ScoreSlider(
+                            label = label,
+                            score = value,
+                            maxScore = maxValue[label]!!,
+                            color = song.basicInfo.genre.theme
+                        )
+                    }
+                    DetailsScoreTable(chart, song.basicInfo.genre.theme)
+                    MinDxScoreTable(chart.notes.total() * 3, song.basicInfo.genre.theme)
                 }
             }
         }
@@ -140,7 +159,7 @@ fun DetailsPages(
 
 @Preview
 @Composable
-fun ScoreSlider(
+private fun ScoreSlider(
     label: String = "Label",
     score: Int = 880,
     maxScore: Int = 1000,

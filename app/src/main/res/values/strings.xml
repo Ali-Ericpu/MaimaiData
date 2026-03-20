@@ -27,4 +27,14 @@
     <string name="author">谱面作者</string>
     <string name="state">达成状态</string>
     <string name="none_score">暂无成绩</string>
+    <string name="great">GREAT</string>
+    <string name="good">GOOD</string>
+    <string name="miss">MISS</string>
+    <string name="tap">TAP</string>
+    <string name="hold">HOLD</string>
+    <string name="slide">SLIDE</string>
+    <string name="_break">BREAK</string>
+    <string name="break_50">50落</string>
+    <string name="break_100">100落</string>
+    <string name="min_dx_score">最低DX分数</string>
 </resources>

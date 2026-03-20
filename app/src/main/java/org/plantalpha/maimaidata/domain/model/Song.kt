@@ -76,13 +76,16 @@ data class Song(
         val `break`: Int
     ) {
         fun entries(): List<Pair<String, Int>> = listOf(
-            "Total" to tap + hold + slide + (touch ?: 0) + `break`,
+            "Total" to total(),
             "Tab" to tap,
             "Hold" to hold,
             "Slide" to slide,
             "Touch" to (touch ?: 0),
             "Break" to `break`
         )
+
+        fun total(): Int = tap + hold + slide + (touch ?: 0) + `break`
+
     }
 
     enum class Type(@DrawableRes val res: Int?) {

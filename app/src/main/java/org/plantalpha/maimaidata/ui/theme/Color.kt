@@ -18,3 +18,9 @@ val chartsScoreColors = listOf(
     Color(0xFF686BFF),
     Color(0xFF2AC7DB),
 )
+
+val MaimaiBlue = Color(0xFF0D3B66)
+val MaimaiGreatPink = Color(0xFFFF4081)
+val MaimaiGoodGreen = Color(0xFF2EBD59)
+val MaimaiMissGrey = Color(0xFF757575)
+val BorderColor = Color(0xFFE0E0E0)

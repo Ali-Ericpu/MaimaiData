@@ -37,11 +37,12 @@ fun SongDetailsPage(
     song: Song = Song.song,
     alias: List<String> = emptyList(),
     viewModel: SongDetailsViewModel = hiltViewModel(),
-    onBack : () -> Unit = {}
+    onBack: () -> Unit = {}
 ) {
     var maxOffsetY by remember { mutableIntStateOf(0) }
     val scrollState = remember { DetailsScrollState(0, 0) }
     val flingBehavior = ScrollableDefaults.flingBehavior()
+    val tabs = viewModel.tabs(song.charts.size)
     Scaffold(
         topBar = {
             DetailsTopBar(
@@ -124,7 +125,7 @@ fun SongDetailsPage(
                         }
                     }
             )
-            DetailsPages(song)
+            DetailsPages(song, tabs)
         }
     }
 }
