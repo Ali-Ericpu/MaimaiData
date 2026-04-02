@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +44,7 @@ fun SongDetailsPage(
     val scrollState = remember { DetailsScrollState(0, 0) }
     val flingBehavior = ScrollableDefaults.flingBehavior()
     val tabs = viewModel.tabs(song.charts.size)
+    val maxChartNote by viewModel.maxChartNote.collectAsState()
     Scaffold(
         topBar = {
             DetailsTopBar(
@@ -125,7 +127,7 @@ fun SongDetailsPage(
                         }
                     }
             )
-            DetailsPages(song, tabs)
+            DetailsPages(song, tabs, maxChartNote)
         }
     }
 }

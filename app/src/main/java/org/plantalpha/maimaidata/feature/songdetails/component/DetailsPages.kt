@@ -37,6 +37,7 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
 import kotlinx.coroutines.launch
 import org.plantalpha.maimaidata.R
+import org.plantalpha.maimaidata.domain.model.MaxChartNote
 import org.plantalpha.maimaidata.domain.model.Song
 
 @Preview
@@ -44,10 +45,12 @@ import org.plantalpha.maimaidata.domain.model.Song
 fun DetailsPages(
     song: Song = Song.song,
     tabs: List<String> = listOf("MAS", "EXP", "ADV", "BAS"),
+    maxChartNote: MaxChartNote = MaxChartNote()
 ) {
     val charts = song.charts.reversed()
     val pagerState = rememberPagerState { charts.size }
     val coroutineScope = rememberCoroutineScope()
+    val maxValue = maxChartNote.entries()
     Column(modifier = Modifier.fillMaxSize()) {
         SecondaryTabRow(
             modifier = Modifier.fillMaxWidth(),
@@ -132,14 +135,6 @@ fun DetailsPages(
                         )
                         Spacer(modifier = Modifier.weight(1f))
                     }
-                    val maxValue = mapOf(
-                        "Total" to 1000,
-                        "Tab" to 1000,
-                        "Hold" to 1000,
-                        "Slide" to 1000,
-                        "Touch" to 1000,
-                        "Break" to 1000,
-                    )
                     chart.notes.entries().fastForEach { (label, value) ->
                         ScoreSlider(
                             label = label,

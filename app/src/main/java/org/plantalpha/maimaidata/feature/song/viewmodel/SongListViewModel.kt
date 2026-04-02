@@ -6,12 +6,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.plantalpha.maimaidata.R
+import org.plantalpha.maimaidata.domain.model.MaxChartNote
 import org.plantalpha.maimaidata.domain.model.Song
 import org.plantalpha.maimaidata.extension.toast
 import org.plantalpha.maimaidata.network.SongApi
@@ -30,6 +33,7 @@ class SongListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val songDao = songDatabase.songDao()
+    private val chartNoteDao = songDatabase.chartNoteDao()
 
     private val version = dataRepository.getVersion()
         .stateIn(viewModelScope, SharingStarted.Eagerly, "")
@@ -77,7 +81,7 @@ class SongListViewModel @Inject constructor(
                 if (version.value != dataVersion) {
                     latestVersion = dataVersion
                     _showUpdateDialog.value = true
-                } else if (songList.isNotEmpty()){
+                } else if (songList.isNotEmpty()) {
                     context.toast(R.string.already_latest_version)
                 }
                 Log.d("VERSION", "Latest DataVersion: $dataVersion")
@@ -116,7 +120,9 @@ class SongListViewModel @Inject constructor(
     fun loadSongData() = viewModelScope.launch {
         _isRefreshing.value = true
         songList = songDao.getAll()
-        if (songList.isNotEmpty()) {
+        if (songList.isEmpty()) {
+            updateSongData()
+        } else {
             updateAliasData()
         }
         _sortedSongList.value = songList.sortedBy { it.sortId }
@@ -126,12 +132,21 @@ class SongListViewModel @Inject constructor(
     fun updateSongData() = viewModelScope.launch {
         _isRefreshing.value = true
         Log.d("UPDATE", "updateSongData: ${version.value}")
-        songList = songApi.getSongList(URLEncoder.encode(version.value, "UTF-8"))
-        songDao.deleteAll()
-        songDao.insertAll(songList)
-        _sortedSongList.value = songList.sortedBy { it.sortId }
-        updateAliasData()
-        _searchData.value = Song.Search("", false, emptyList(), emptyList())
+        runCatching {
+            songApi.getSongList(URLEncoder.encode(version.value, "UTF-8"))
+        }.onSuccess { songs ->
+            songList = songs
+            launch(Dispatchers.IO) {
+                songDao.deleteAll()
+                songDao.insertAll(songList)
+            }
+            _sortedSongList.value = songList.sortedBy { it.sortId }
+            updateAliasData()
+            _searchData.value = Song.Search("", false, emptyList(), emptyList())
+            launch {
+                calculateMaxNoteStats(songList)
+            }
+        }
         _isRefreshing.value = false
     }
 
@@ -162,4 +177,42 @@ class SongListViewModel @Inject constructor(
     }
 
     fun getAlias(id: Int): List<String> = aliasData[id] ?: emptyList()
+
+    //获取整个 songList 中所有曲目、所有难度下的最大值
+    suspend fun calculateMaxNoteStats(songList: List<Song>) = withContext(Dispatchers.Default) {
+        var maxTap = 0
+        var maxHold = 0
+        var maxSlide = 0
+        var maxTouch = 0
+        var maxBreak = 0
+        var maxTotal = 0
+
+        songList.asSequence()
+            .flatMap { it.charts }
+            .forEach { chart ->
+                val notes = chart.notes
+                val currentTouch = notes.touch ?: 0
+                val currentTotal = notes.total()
+
+                maxTap = maxOf(maxTap, notes.tap)
+                maxHold = maxOf(maxHold, notes.hold)
+                maxSlide = maxOf(maxSlide, notes.slide)
+                maxTouch = maxOf(maxTouch, currentTouch)
+                maxBreak = maxOf(maxBreak, notes.`break`)
+                maxTotal = maxOf(maxTotal, currentTotal)
+            }
+
+        val maxChartNote = MaxChartNote(
+            version = version.value,
+            maxTap = maxTap,
+            maxHold = maxHold,
+            maxSlide = maxSlide,
+            maxTouch = maxTouch,
+            maxBreak = maxBreak,
+            maxTotal = maxTotal
+        )
+        Log.d("MaxChartNote", "calculateMaxNoteStats: $maxChartNote")
+        chartNoteDao.insert(maxChartNote)
+    }
+
 }
